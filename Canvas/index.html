@@ -57,7 +57,7 @@
   <body>
     <div id="teste"></div>
     <div id="containerImg" unselectable="on" onClick="addApp(event)">
-      <img unselectable="on" src="ref_desembarqueTps2.png" />
+      <img unselectable="on" src="./img/floorplant.png" />
       <div class="Marker" style="top: 8%; left: 29%;"></div>
     </div>
     <div id="zoomMenu">
@@ -120,13 +120,9 @@
           "Posição x:" + (x + offsetX) + " Posição y" + (y + offsetY)
         );
         let posX =
-          ((x - offsetX + window.scrollX - apIconSize / 2) /
-            currentSize.width) *
-          100;
+          (x - offsetX + window.scrollX - apIconSize / 2) / currentSize.width;
         let posY =
-          ((y - offsetY + window.scrollY - apIconSize / 2) /
-            currentSize.height) *
-          100;
+          (y - offsetY + window.scrollY - apIconSize / 2) / currentSize.height;
 
         console.log("width %: " + posX);
         console.log("height %: " + posY);
