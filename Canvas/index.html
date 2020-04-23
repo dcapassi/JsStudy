@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Js "Canvas" study</title>
+    <style>
+      :root {
+        --ap-icon-size: 30px;
+      }
+      * {
+        padding: 0px;
+        margin: 0px;
+      }
+
+      #containerImg {
+        position: relative;
+        width: 1280px;
+        height: 648px;
+        user-select: none;
+        border: 1px solid;
+      }
+
+      img {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+      }
+
+      .Marker {
+        position: absolute;
+        background-color: blue;
+        border-radius: 50%;
+        width: var(--ap-icon-size);
+        height: var(--ap-icon-size);
+      }
+      #zoomMenu {
+        z-index: 1;
+        top: 50%;
+        position: fixed;
+        width: 60px;
+        left: 5%;
+        border: 1px solid black;
+        border-radius: 8px;
+        background-color: white;
+      }
+      button {
+        position: relative;
+        vertical-align: center;
+        align-content: center;
+      }
+      #teste {
+        height: 50px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="teste"></div>
+    <div id="containerImg" unselectable="on" onClick="addApp(event)">
+      <img unselectable="on" src="ref_desembarqueTps2.png" />
+      <div class="Marker" style="top: 8%; left: 29%;"></div>
+    </div>
+    <div id="zoomMenu">
+      <button onClick="zoomIn()">ZoomIn</button>
+      <button onClick="zoomOut()">ZoomOut</button>
+    </div>
+
+    <script>
+      var apIconSize = 30;
+
+      let sizeArray = [
+        { width: 1280, height: 648 },
+        { width: 2560, height: 1296 },
+        { width: 5120, height: 2592 },
+      ];
+      var currentSize = sizeArray[0];
+
+      function zoomIn() {
+        console.log("ZoomIn");
+        getIndex = sizeArray.findIndex(
+          (item, index) => item.width === currentSize.width
+        );
+        if (getIndex + 1 < sizeArray.length) {
+          currentSize = sizeArray[getIndex + 1];
+        }
+        console.log(currentSize);
+
+        document.getElementById(
+          "containerImg"
+        ).style.width = `${currentSize.width}px`;
+        document.getElementById(
+          "containerImg"
+        ).style.height = `${currentSize.height}px`;
+      }
+      function zoomOut() {
+        console.log("ZoomOut");
+        getIndex = sizeArray.findIndex(
+          (item, index) => item.width === currentSize.width
+        );
+
+        if (getIndex > 0) {
+          currentSize = sizeArray[getIndex - 1];
+        }
+        console.log(currentSize);
+
+        document.getElementById(
+          "containerImg"
+        ).style.width = `${currentSize.width}px`;
+        document.getElementById(
+          "containerImg"
+        ).style.height = `${currentSize.height}px`;
+      }
+
+      function addApp(event) {
+        let x = event.clientX;
+        let y = event.clientY;
+        let offsetY = document.getElementById("containerImg").offsetTop;
+        let offsetX = document.getElementById("containerImg").offsetLeft;
+        console.log(
+          "Posição x:" + (x + offsetX) + " Posição y" + (y + offsetY)
+        );
+        let posX =
+          ((x - offsetX + window.scrollX - apIconSize / 2) /
+            currentSize.width) *
+          100;
+        let posY =
+          ((y - offsetY + window.scrollY - apIconSize / 2) /
+            currentSize.height) *
+          100;
+
+        console.log("width %: " + posX);
+        console.log("height %: " + posY);
+        console.log("OffsetX: " + offsetX);
+        console.log("OffsetY: " + offsetY);
+        console.log("ScrollX: " + window.scrollX);
+        console.log("ScrollY: " + window.scrollY);
+
+        newApDiv = document.createElement("div");
+        newApDiv.classList.add("Marker");
+        newApDiv.style.top = `${posY}%`;
+        newApDiv.style.left = `${posX}%`;
+        document.getElementById("containerImg").appendChild(newApDiv);
+      }
+    </script>
+  </body>
+</html>
