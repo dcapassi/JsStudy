@@ -18,7 +18,6 @@
         width: 1280px;
         height: 648px;
         user-select: none;
-        border: 1px solid;
       }
 
       img {
@@ -58,7 +57,7 @@
     <div id="teste"></div>
     <div id="containerImg" unselectable="on" onClick="addApp(event)">
       <img unselectable="on" src="./img/floorplant.png" />
-      <div class="Marker" style="top: 8%; left: 29%;"></div>
+      <!--<div class="Marker" style="top: 123px; left: 217px;"></div>-->
     </div>
     <div id="zoomMenu">
       <button onClick="zoomIn()">ZoomIn</button>
@@ -74,16 +73,47 @@
         { width: 5120, height: 2592 },
       ];
       var currentSize = sizeArray[0];
+      var previousSize = currentSize;
+
+      function convertion(inp1, out1, outx) {
+        console.log("Result: " + (inp1 * outx) / out1);
+        return (inp1 * outx) / out1;
+      }
+
+      function updatePosition(offset1, offset2 = 0) {
+        markerList = document.getElementsByClassName("Marker");
+        for (let item of markerList) {
+          sizeStr = item.style.top;
+          sizeStr = sizeStr.substring(0, sizeStr.length - 2);
+          intSize = parseFloat(sizeStr) + offset2;
+          console.log("Converting: " + intSize);
+          item.style.top =
+            convertion(intSize, previousSize.height, currentSize.height) +
+            offset1 +
+            "px";
+
+          sizeStr = item.style.left;
+          sizeStr = sizeStr.substring(0, sizeStr.length - 2);
+          intSize = parseFloat(sizeStr) + offset2;
+          console.log("Converting: " + intSize);
+
+          item.style.left =
+            convertion(intSize, previousSize.width, currentSize.width) +
+            offset1 +
+            "px";
+        }
+      }
 
       function zoomIn() {
         console.log("ZoomIn");
+        previousSize = currentSize;
         getIndex = sizeArray.findIndex(
           (item, index) => item.width === currentSize.width
         );
         if (getIndex + 1 < sizeArray.length) {
           currentSize = sizeArray[getIndex + 1];
+          updatePosition(15);
         }
-        console.log(currentSize);
 
         document.getElementById(
           "containerImg"
@@ -93,6 +123,7 @@
         ).style.height = `${currentSize.height}px`;
       }
       function zoomOut() {
+        previousSize = currentSize;
         console.log("ZoomOut");
         getIndex = sizeArray.findIndex(
           (item, index) => item.width === currentSize.width
@@ -100,6 +131,7 @@
 
         if (getIndex > 0) {
           currentSize = sizeArray[getIndex - 1];
+          updatePosition(0, -15);
         }
         console.log(currentSize);
 
@@ -116,25 +148,13 @@
         let y = event.clientY;
         let offsetY = document.getElementById("containerImg").offsetTop;
         let offsetX = document.getElementById("containerImg").offsetLeft;
-        console.log(
-          "Posição x:" + (x + offsetX) + " Posição y" + (y + offsetY)
-        );
-        let posX =
-          (x - offsetX + window.scrollX - apIconSize / 2) / currentSize.width;
-        let posY =
-          (y - offsetY + window.scrollY - apIconSize / 2) / currentSize.height;
-
-        console.log("width %: " + posX);
-        console.log("height %: " + posY);
-        console.log("OffsetX: " + offsetX);
-        console.log("OffsetY: " + offsetY);
-        console.log("ScrollX: " + window.scrollX);
-        console.log("ScrollY: " + window.scrollY);
+        let posX = x - offsetX + window.scrollX - apIconSize / 2;
+        let posY = y - offsetY + window.scrollY - apIconSize / 2;
 
         newApDiv = document.createElement("div");
         newApDiv.classList.add("Marker");
-        newApDiv.style.top = `${posY}%`;
-        newApDiv.style.left = `${posX}%`;
+        newApDiv.style.top = `${posY}px`;
+        newApDiv.style.left = `${posX}px`;
         document.getElementById("containerImg").appendChild(newApDiv);
       }
     </script>
