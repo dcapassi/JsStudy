@@ -1,6 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { ApMapContainer, Controls, ApInstance, Scale } from "./styles";
-import backgroundImg from "../ApMap/img/base.png";
+import {
+  ApMapContainer,
+  Controls,
+  ApInstance,
+  Scale,
+  ScaleImg,
+} from "./styles";
+import backgroundImg from "../ApMap/img/blueprint.png";
 import { AiOutlineWifi } from "react-icons/ai";
 import { GiCrosshair } from "react-icons/gi";
 
@@ -15,8 +21,8 @@ export default function ApMap() {
   const [apCount, setApCount] = useState(1);
   const [apInstances, setApInstance] = useState([]);
   const [scaleMode, setScaleMode] = useState(true);
-  const [scaleWidth, setScaleWidth] = useState(20);
-  const [scaleHeight, setScaleHeight] = useState(20);
+  const [scaleWidth, setScaleWidth] = useState(30);
+  const [scaleHeight, setScaleHeight] = useState(30);
   const [scaleX, setScaleX] = useState(0);
   const [scaleY, setScaleY] = useState(0);
   const [scaleXEnd, setScaleXEnd] = useState(0);
@@ -24,12 +30,23 @@ export default function ApMap() {
   const [scaleDistance, setScaleDistance] = useState(0);
   const [scaleAngle, setScaleAngle] = useState(0);
   const [apsDraggable, setApsDraggable] = useState(true);
-  const [scaleFirstClick, setScaleFirstClick] = useState(false);
+  const [scaleCountClick, setCountClick] = useState(0);
   const [scaleInitialVisible, setScaleInitialVisible] = useState(false);
   const [scaleEndVisible, setScaleEndVisible] = useState(false);
 
   useEffect(() => {
-    calcDistance();
+    if (scaleCountClick == 2) {
+      if (scaleXEnd < scaleX) {
+        let swap = scaleXEnd;
+        setScaleXEnd(scaleX);
+        setScaleX(swap);
+        swap = scaleYEnd;
+        setScaleYEnd(scaleY);
+        setScaleY(swap);
+      }
+
+      calcDistance();
+    }
   });
 
   const calcDistance = () => {
@@ -44,6 +61,7 @@ export default function ApMap() {
     console.log("Distance:" + distance);
     calcAngle();
     setScaleDistance(distance);
+    setScaleEndVisible(true);
   };
 
   const calcAngle = () => {
@@ -67,16 +85,22 @@ export default function ApMap() {
     let posX = x - offsetX + window.scrollX - scaleWidth / 2;
     let posY = y - offsetY + window.scrollY - scaleHeight / 2;
 
-    if (scaleFirstClick === false) {
+    if (scaleCountClick === 0) {
       setScaleX(posX);
       setScaleY(posY);
-      setScaleFirstClick(true);
+      setCountClick(1);
       setScaleInitialVisible(true);
     } else {
       setScaleXEnd(posX);
       setScaleYEnd(posY);
-      setScaleFirstClick(false);
-      setScaleEndVisible(true);
+      setCountClick(2);
+    }
+    if (scaleCountClick === 2) {
+      setScaleX(posX);
+      setScaleY(posY);
+      setScaleEndVisible(false);
+      setCountClick(1);
+      setScaleInitialVisible(true);
     }
   };
 
@@ -125,6 +149,22 @@ export default function ApMap() {
       fator = 0.5;
     }
 
+    //Updating Scale Markers
+    let scalePosX = scaleX + offset2;
+    let scalePosY = scaleY + offset2;
+    let newScaleValueX = scalePosX * fator + offset1;
+    let newScaleValueY = scalePosY * fator + offset1;
+    setScaleX(newScaleValueX);
+    setScaleY(newScaleValueY);
+
+    scalePosX = scaleXEnd + offset2;
+    scalePosY = scaleYEnd + offset2;
+    newScaleValueX = scalePosX * fator + offset1;
+    newScaleValueY = scalePosY * fator + offset1;
+    setScaleXEnd(newScaleValueX);
+    setScaleYEnd(newScaleValueY);
+    setApInstance(tempArray);
+
     apInstances.map((Ap) => {
       let posX = Ap.posX + offset2;
       let posY = Ap.posY + offset2;
@@ -140,7 +180,6 @@ export default function ApMap() {
       } catch (error) {
         console.log("Erro: " + error);
       }
-      setApInstance(tempArray);
     });
   }
 
@@ -231,8 +270,9 @@ export default function ApMap() {
           scaleX={scaleX + "px"}
           scaleY={scaleY + "px"}
           visible={scaleInitialVisible}
+          zIndex="2"
         >
-          <GiCrosshair />
+          <GiCrosshair size={"2x"} />
         </Scale>
         <Scale
           width={scaleWidth + "px"}
@@ -240,17 +280,22 @@ export default function ApMap() {
           scaleX={scaleXEnd + "px"}
           scaleY={scaleYEnd + "px"}
           visible={scaleEndVisible}
+          zIndex="2"
         >
-          <GiCrosshair />
+          <GiCrosshair size={"2x"} />
         </Scale>
-        <Scale
-          width={scaleDistance - scaleWidth + "px"}
-          height={scaleHeight + "px"}
-          scaleX={scaleX + scaleWidth + "px"}
-          scaleY={scaleY + "px"}
+        <ScaleImg
+          width={scaleDistance + "px"}
+          height={20 + "px"}
+          scaleX={scaleX + scaleWidth / 2 + "px"}
+          scaleY={scaleY + scaleHeight / 2 + "px"}
+          color="blue"
           visible={scaleEndVisible}
           rotate={scaleAngle}
-        />
+          zIndex="1"
+        >
+          <div>{`${scaleDistance.toFixed(2)} metros`}</div>
+        </ScaleImg>
         <img src={backgroundImg} />
 
         {apInstances.map((Ap) => {
@@ -284,3 +329,4 @@ export default function ApMap() {
     </>
   );
 }
+//
