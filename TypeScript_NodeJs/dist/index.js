@@ -5,6 +5,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 var express_1 = __importDefault(require("express"));
 var routes_1 = require("./routes");
+var routes_2 = require("./routes");
 var app = express_1.default();
-app.get("/", routes_1.helloWorld);
+app.get("/", routes_1.createUser);
+app.get("/icmp", routes_2.icmp);
 app.listen(3333);
